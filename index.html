@@ -4,58 +4,441 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tripoholics - Your Travel Diary</title>
+<title>Tripoholics - ভ্রমণের গল্প</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;background:#f4f7fa;color:#172b3a}
-header{background:#102a43;color:white;padding:22px 15px;text-align:center}
-header h1{margin:0;font-size:30px;letter-spacing:2px}
-header p{margin:8px 0 0;color:#d8e8f5}
-nav{background:#1769aa;padding:13px;text-align:center}
-nav a{color:white;text-decoration:none;margin:0 10px;font-weight:bold}
-.hero{min-height:320px;background:linear-gradient(#0007,#0007),url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200') center/cover;display:flex;align-items:center;justify-content:center;text-align:center;color:white;padding:25px}
-.hero h2{font-size:34px;margin:0 0 12px}
-.container{max-width:1050px;margin:25px auto;padding:15px}
-.section-title{text-align:center;color:#1769aa}
-.card{background:white;border-radius:12px;padding:15px;margin:15px 0;box-shadow:0 3px 12px #0001}
-.card img{width:100%;max-height:350px;object-fit:cover;border-radius:9px}
-button{background:#1769aa;color:white;border:0;padding:12px 20px;border-radius:7px;cursor:pointer}
-input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ccd6df;border-radius:7px}
-footer{background:#102a43;color:white;text-align:center;padding:25px;margin-top:35px}
+body{margin:0;font-family:Arial,sans-serif;background:#f4f7f8;color:#24313b}
+header{background:#123b50;color:white;padding:28px 15px;text-align:center}
+header h1{margin:0;font-size:32px}
+header p{margin:10px 0 0}
+nav{background:#0d2d3d;padding:12px;text-align:center}
+nav a{color:white;text-decoration:none;margin:0 12px}
+main{max-width:900px;margin:25px auto;padding:0 14px}
+section,.post,.adminbox{background:white;padding:20px;border-radius:12px;margin-bottom:20px;box-shadow:0 2px 10px #0000000c}
+h2{color:#126078}
+input,textarea,button{width:100%;padding:12px;margin:7px 0;border:1px solid #ccd5d9;border-radius:7px;font-size:16px}
+textarea{min-height:110px}
+button{background:#087f8c;color:white;border:0;cursor:pointer}
+button:hover{background:#06616b}
+button.danger{background:#b83232}
+button.secondary{background:#526875}
+.post img{width:100%;max-height:430px;object-fit:cover;border-radius:9px}
+.post h2{margin-bottom:5px}
+.meta{color:#71818b;font-size:14px}
+.story{white-space:pre-wrap;line-height:1.7}
+.comment{background:#f2f6f7;padding:10px;border-radius:7px;margin:8px 0}
+.hidden{display:none}
+footer{text-align:center;background:#123b50;color:white;padding:22px;margin-top:35px}
+.small{font-size:13px;color:#657680}
 </style>
 </head>
 <body>
+
 <header>
-<h1>TRIPOHOLICS</h1>
-<p>Explore • Capture • Share</p>
+<h1>🌍 Tripoholics</h1>
+<p>ভ্রমণের গল্প, স্মৃতি আর নতুন জায়গার সন্ধান</p>
 </header>
+
 <nav>
 <a href="#home">হোম</a>
-<a href="#travel">আমার ভ্রমণ</a>
-<a href="#about">আমাদের সম্পর্কে</a>
+<a href="#stories">ভ্রমণের গল্প</a>
+<a href="#admin">অ্যাডমিন</a>
 </nav>
-<section class="hero" id="home">
-<div>
-<h2>Your Journey, Your Story</h2>
-<p>পৃথিবীর সৌন্দর্য আবিষ্কার করুন, স্মৃতি ধরে রাখুন।</p>
+
+<main>
+<section id="home">
+<h2>স্বাগতম Tripoholics-এ</h2>
+<p>নিজের ভ্রমণের ছবি ও অভিজ্ঞতা সবার সঙ্গে ভাগ করে নিন।</p>
+</section>
+
+<section id="admin">
+<h2>অ্যাডমিন লগইন</h2>
+<div id="loginArea">
+<input id="email" type="email" placeholder="অ্যাডমিন ইমেইল">
+<input id="password" type="password" placeholder="পাসওয়ার্ড">
+<button onclick="login()">লগইন করুন</button>
+<p id="loginMessage" class="small"></p>
+</div>
+
+<div id="adminArea" class="hidden">
+<p>অ্যাডমিন হিসেবে লগইন করেছেন।</p>
+<button class="secondary" onclick="logout()">লগআউট</button>
+
+<h2>নতুন ভ্রমণের গল্প প্রকাশ করুন</h2>
+<input id="postTitle" placeholder="ভ্রমণের শিরোনাম">
+<input id="postLocation" placeholder="ভ্রমণের স্থান">
+<textarea id="postStory" placeholder="আপনার ভ্রমণের অভিজ্ঞতা লিখুন"></textarea>
+<label>ভ্রমণের ছবি নির্বাচন করুন</label>
+<input id="postPhoto" type="file" accept="image/*">
+<button onclick="savePost()">পোস্ট প্রকাশ করুন</button>
+<p id="postMessage" class="small"></p>
+
+<h2>মন্তব্য অনুমোদন</h2>
+<div id="pendingComments"></div>
 </div>
 </section>
-<div class="container" id="travel">
-<h2 class="section-title">আমার ভ্রমণ ডায়েরি</h2>
-<div class="card">
-<h3>স্বাগতম Tripoholics-এ</h3>
-<p>এখানে আমার ভ্রমণের ছবি, অভিজ্ঞতা ও স্মৃতিগুলো শেয়ার করা হবে।</p>
-</div>
-</div>
-<div class="container" id="about">
-<h2 class="section-title">আমাদের সম্পর্কে</h2>
-<div class="card">
-<p>Tripoholics একটি ব্যক্তিগত ভ্রমণ ডায়েরি। ভ্রমণের সুন্দর মুহূর্ত ও অভিজ্ঞতা সবার সঙ্গে ভাগ করে নেওয়াই আমাদের উদ্দেশ্য।</p>
-</div>
-</div>
+
+<section id="stories">
+<h2>সাম্প্রতিক ভ্রমণের গল্প</h2>
+<div id="posts">লোড হচ্ছে...</div>
+</section>
+</main>
+
 <footer>
-<p>© 2026 Tripoholics | All Rights Reserved</p>
-<p>Explore • Capture • Share</p>
+<p>© Tripoholics | ভ্রমণ হোক আনন্দময়</p>
 </footer>
+
+<script>
+// Supabase সংযোগ
+const SUPABASE_URL = "https://jonajwweyvfdqqkcrseg.supabase.co";
+const SUPABASE_KEY = "sb_publishable_OnbWEJ_y9q3TVOvrtOtMPA_dTC91C8l";
+
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let currentUser = null;
+let editingPostId = null;
+
+function safe(value){
+ return String(value ?? "").replace(/[&<>"']/g, c => ({
+ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+ })[c]);
+}
+
+async function checkAdmin(){
+ const {data:{user}} = await db.auth.getUser();
+ currentUser = user;
+
+ if(!user){
+  showLoggedOut();
+  return;
+ }
+
+ const {data,error} = await db
+  .from("admin_users")
+  .select("user_id")
+  .eq("user_id",user.id)
+  .maybeSingle();
+
+ if(error || !data){
+  currentUser = null;
+  await db.auth.signOut();
+  showLoggedOut();
+  document.getElementById("loginMessage").textContent =
+   "এই অ্যাকাউন্টটি অ্যাডমিন হিসেবে অনুমোদিত নয়।";
+  return;
+ }
+
+ document.getElementById("loginArea").classList.add("hidden");
+ document.getElementById("adminArea").classList.remove("hidden");
+ loadPendingComments();
+ loadPosts();
+}
+
+function showLoggedOut(){
+ document.getElementById("loginArea").classList.remove("hidden");
+ document.getElementById("adminArea").classList.add("hidden");
+}
+
+async function login(){
+ const email = document.getElementById("email").value.trim();
+ const password = document.getElementById("password").value;
+ const msg = document.getElementById("loginMessage");
+
+ if(!email || !password){
+  msg.textContent = "ইমেইল ও পাসওয়ার্ড লিখুন।";
+  return;
+ }
+
+ msg.textContent = "লগইন হচ্ছে...";
+ const {error} = await db.auth.signInWithPassword({email,password});
+
+ if(error){
+  msg.textContent = "লগইন হয়নি: " + error.message;
+  return;
+ }
+
+ msg.textContent = "";
+ await checkAdmin();
+}
+
+async function logout(){
+ await db.auth.signOut();
+ currentUser = null;
+ showLoggedOut();
+ document.getElementById("password").value = "";
+}
+
+async function loadPosts(){
+ const area = document.getElementById("posts");
+ area.innerHTML = "লোড হচ্ছে...";
+
+ const {data:posts,error} = await db
+  .from("travel_posts")
+  .select("*")
+  .eq("is_published",true)
+  .order("created_at",{ascending:false});
+
+ if(error){
+  area.textContent = "পোস্ট লোড হয়নি: " + error.message;
+  return;
+ }
+
+ if(!posts || posts.length === 0){
+  area.textContent = "এখনো কোনো ভ্রমণের গল্প প্রকাশ করা হয়নি।";
+  return;
+ }
+
+ const {data:comments} = await db
+  .from("comments")
+  .select("*")
+  .eq("is_approved",true)
+  .order("created_at",{ascending:true});
+
+ area.innerHTML = "";
+
+ posts.forEach(post=>{
+  const card = document.createElement("article");
+  card.className = "post";
+
+  let image = post.photo_url
+   ? `<img src="${safe(post.photo_url)}" alt="ভ্রমণের ছবি">`
+   : "";
+
+  let postComments = (comments || []).filter(c=>c.post_id === post.id);
+
+  let commentHTML = postComments.map(c=>
+   `<div class="comment"><b>${safe(c.name)}</b><p>${safe(c.comment)}</p></div>`
+  ).join("");
+
+  let adminButtons = currentUser
+   ? `<button class="secondary" onclick="editPost('${safe(post.id)}')">সম্পাদনা</button>
+      <button class="danger" onclick="deletePost('${safe(post.id)}')">মুছে ফেলুন</button>`
+   : "";
+
+  card.innerHTML = `
+   ${image}
+   <h2>${safe(post.title)}</h2>
+   <p class="meta">📍 ${safe(post.location || "")}</p>
+   <div class="story">${safe(post.story)}</div>
+   ${adminButtons}
+   <hr>
+   <h3>মন্তব্য</h3>
+   <div>${commentHTML || "এখনো কোনো অনুমোদিত মন্তব্য নেই।"}</div>
+   <input id="name-${safe(post.id)}" placeholder="আপনার নাম">
+   <textarea id="comment-${safe(post.id)}" placeholder="আপনার মন্তব্য লিখুন"></textarea>
+   <button onclick="sendComment('${safe(post.id)}')">মন্তব্য পাঠান</button>
+   <p id="commentMsg-${safe(post.id)}" class="small"></p>
+  `;
+
+  area.appendChild(card);
+ });
+}
+
+async function savePost(){
+ const msg = document.getElementById("postMessage");
+ const title = document.getElementById("postTitle").value.trim();
+ const location = document.getElementById("postLocation").value.trim();
+ const story = document.getElementById("postStory").value.trim();
+ const file = document.getElementById("postPhoto").files[0];
+
+ if(!title || !story){
+  msg.textContent = "শিরোনাম ও গল্প লিখুন।";
+  return;
+ }
+
+ msg.textContent = "সংরক্ষণ হচ্ছে...";
+ let photo_url = null;
+
+ if(editingPostId){
+  const {data:oldPost} = await db.from("travel_posts")
+   .select("photo_url").eq("id",editingPostId).single();
+  photo_url = oldPost?.photo_url || null;
+ }
+
+ if(file){
+  if(!file.type.startsWith("image/")){
+   msg.textContent = "শুধু ছবির ফাইল নির্বাচন করুন।";
+   return;
+  }
+  if(file.size > 5 * 1024 * 1024){
+   msg.textContent = "ছবির সাইজ ৫ MB-এর কম হতে হবে।";
+   return;
+  }
+
+  const filePath = Date.now() + "-" +
+   Math.random().toString(36).slice(2) + "-" +
+   file.name.replace(/[^a-zA-Z0-9._-]/g,"_");
+
+  const {error:uploadError} = await db.storage
+   .from("travel-photos")
+   .upload(filePath,file);
+
+  if(uploadError){
+   msg.textContent = "ছবি আপলোড হয়নি: " + uploadError.message;
+   return;
+  }
+
+  const {data:urlData} = db.storage
+   .from("travel-photos")
+   .getPublicUrl(filePath);
+
+  photo_url = urlData.publicUrl;
+ }
+
+ const postData = {
+  title, location, story,
+  photo_url,
+  is_published:true
+ };
+
+ let result;
+
+ if(editingPostId){
+  result = await db.from("travel_posts")
+   .update(postData).eq("id",editingPostId);
+ }else{
+  result = await db.from("travel_posts").insert(postData);
+ }
+
+ if(result.error){
+  msg.textContent = "সংরক্ষণ হয়নি: " + result.error.message;
+  return;
+ }
+
+ editingPostId = null;
+ document.getElementById("postTitle").value = "";
+ document.getElementById("postLocation").value = "";
+ document.getElementById("postStory").value = "";
+ document.getElementById("postPhoto").value = "";
+ msg.textContent = "সফলভাবে প্রকাশ হয়েছে!";
+
+ loadPosts();
+}
+
+async function editPost(id){
+ const {data,error} = await db.from("travel_posts")
+  .select("*").eq("id",id).single();
+
+ if(error || !data){
+  alert("পোস্ট পাওয়া যায়নি।");
+  return;
+ }
+
+ editingPostId = id;
+ document.getElementById("postTitle").value = data.title || "";
+ document.getElementById("postLocation").value = data.location || "";
+ document.getElementById("postStory").value = data.story || "";
+ document.getElementById("postMessage").textContent =
+  "সম্পাদনা করুন। নতুন ছবি না দিলেও আগের ছবি থাকবে।";
+ document.getElementById("admin").scrollIntoView();
+}
+
+async function deletePost(id){
+ if(!confirm("আপনি কি এই পোস্টটি মুছে ফেলতে চান?")) return;
+
+ const {error} = await db.from("travel_posts").delete().eq("id",id);
+
+ if(error){
+  alert("মুছে ফেলা যায়নি: " + error.message);
+  return;
+ }
+
+ loadPosts();
+}
+
+async function sendComment(postId){
+ const name = document.getElementById("name-"+postId).value.trim();
+ const comment = document.getElementById("comment-"+postId).value.trim();
+ const msg = document.getElementById("commentMsg-"+postId);
+
+ if(!name || !comment){
+  msg.textContent = "নাম ও মন্তব্য লিখুন।";
+  return;
+ }
+
+ const {error} = await db.from("comments").insert({
+  post_id:postId,
+  name,
+  comment
+ });
+
+ if(error){
+  msg.textContent = "মন্তব্য পাঠানো যায়নি: " + error.message;
+  return;
+ }
+
+ msg.textContent = "মন্তব্য পাঠানো হয়েছে। অনুমোদনের পর দেখা যাবে।";
+ document.getElementById("name-"+postId).value = "";
+ document.getElementById("comment-"+postId).value = "";
+}
+
+async function loadPendingComments(){
+ const area = document.getElementById("pendingComments");
+
+ const {data,error} = await db.from("comments")
+  .select("*")
+  .eq("is_approved",false)
+  .order("created_at",{ascending:false});
+
+ if(error){
+  area.textContent = "মন্তব্য লোড হয়নি: " + error.message;
+  return;
+ }
+
+ if(!data || data.length===0){
+  area.textContent = "অনুমোদনের অপেক্ষায় কোনো মন্তব্য নেই।";
+  return;
+ }
+
+ area.innerHTML = "";
+
+ data.forEach(c=>{
+  const item = document.createElement("div");
+  item.className = "comment";
+  item.innerHTML = `
+   <b>${safe(c.name)}</b>
+   <p>${safe(c.comment)}</p>
+   <button onclick="approveComment('${safe(c.id)}')">অনুমোদন</button>
+   <button class="danger" onclick="deleteComment('${safe(c.id)}')">মুছে ফেলুন</button>
+  `;
+  area.appendChild(item);
+ });
+}
+
+async function approveComment(id){
+ const {error} = await db.from("comments")
+  .update({is_approved:true}).eq("id",id);
+
+ if(error){
+  alert("অনুমোদন হয়নি: " + error.message);
+  return;
+ }
+
+ loadPendingComments();
+ loadPosts();
+}
+
+async function deleteComment(id){
+ if(!confirm("মন্তব্যটি মুছে ফেলবেন?")) return;
+
+ const {error} = await db.from("comments").delete().eq("id",id);
+
+ if(error){
+  alert("মুছে ফেলা যায়নি: " + error.message);
+  return;
+ }
+
+ loadPendingComments();
+ loadPosts();
+}
+
+db.auth.onAuthStateChange(()=>{
+ setTimeout(checkAdmin,0);
+});
+
+checkAdmin();
+loadPosts();
+</script>
 </body>
 </html>
