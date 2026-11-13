@@ -280,7 +280,7 @@ async function savePost(){
   }
 
   const {data:urlData} = db.storage
-   .from("travel-photos")
+   .from("TRAVEL_PHOTOS")
    .getPublicUrl(filePath);
 
   photo_url = urlData.publicUrl;
