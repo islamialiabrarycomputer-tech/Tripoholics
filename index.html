@@ -271,7 +271,7 @@ async function savePost(){
    file.name.replace(/[^a-zA-Z0-9._-]/g,"_");
 
   const {error:uploadError} = await db.storage
-   .from("travel-photos")
+   .from("TRAVEL_PHOTOS")
    .upload(filePath,file);
 
   if(uploadError){
